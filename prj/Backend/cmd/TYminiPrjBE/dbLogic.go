@@ -18,15 +18,14 @@ func loadRegistrations(dbPtr *sql.DB) {
 	defer rows.Close()
 
 	currRegister := registerDbDetails{}
-	it := 0
 	for rows.Next() {
 		rows.Scan(&currRegister.id, &currRegister.username, &currRegister.email,
 			&currRegister.passHsh, &currRegister.salt, &currRegister.ticketId)
 		registersDb = append(registersDb, currRegister)
-		it++
 	}
 
 	fmt.Println("-----------Registrations Loaded Successfully-----------")
+	fmt.Println(registersDb)
 }
 
 func registerUser(dbPtr *sql.DB, reg registerDbDetails) {
@@ -44,6 +43,7 @@ func registerUser(dbPtr *sql.DB, reg registerDbDetails) {
 func loadTicketId(dbPtr *sql.DB, id uint32, ticketId uint64) {
 	query := fmt.Sprintf(`UPDATE users SET ticketId=%v WHERE id=%v;`,
 		ticketId, id)
+	fmt.Println(query)
 	_, err = dbPtr.Exec(query)
 	if err != nil {
 		fmt.Println("Error Updating Ticket Value")

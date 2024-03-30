@@ -33,9 +33,9 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 				tmpl.ExecuteTemplate(w, "login.html", "Passwords don't match")
 				return
 			} else {
-				user.Username = log.username
-				user.Id = log.id
-				user.TicketId = log.ticketId
+				user.Username = registersDb[it].username
+				user.Id = registersDb[it].id
+				user.TicketId = registersDb[it].ticketId
 				user.UserQR = fmt.Sprintf(`<img src="./../resources/QRCodes/%v.png" width="128px">`,
 					user.TicketId)
 				http.Redirect(w, r, "/index", http.StatusSeeOther)
@@ -90,8 +90,9 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		registeretDb.passHsh = string(passHshBytes)
 
-		registersDb = append(registersDb, registeretDb)
 		registerUser(dbPtr, registeretDb)
+		registersDb = nil
+		loadRegistrations(dbPtr)
 
 		http.Redirect(w, r, "/index", http.StatusSeeOther)
 	} else {
@@ -137,7 +138,6 @@ func bookingFormHandler(w http.ResponseWriter, r *http.Request) {
 		user.UserQR = fmt.Sprintf(`<img src="./../resources/QRCodes/%v.png" width="128px">`,
 			user.TicketId)
 		loadTicketId(dbPtr, user.Id, user.TicketId)
-		fmt.Println("Called loadTicketId")
 
 		data := "Username: " + user.Username + "\r\n" +
 			"TicketId: " + fmt.Sprint(user.TicketId)
