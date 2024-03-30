@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" 
+      rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" 
+      crossorigin="anonymous">    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>    
+    <title>Document</title>
+</head>
+
+<!-- CSS Begins -->
+<style>
+  a {
+    text-decoration: none;
+    color: white;
+  }
+  body {
+    background-color: black;
+    color: lightgreen;
+    background-image: url('./../resources/backgroundGradient.jpg');
+    background-size: 2160px;
+    font-size: x-large;
+  }
+  small {
+    color: antiquewhite;
+    font-size: medium;
+  }
+
+  #checkout-div {
+    /* margin-right: -4em; */
+    margin-left: 2em;
+  }
+</style>
+<!-- CSS Ends -->
+
+<body style="background-color: black; color:lightgreen; width: 1920; min-height: 1080p;" >
+    <!-- main-div Begins -->
+    <div id="main-div" class="text-center">
+
+      <div class="container">
+
+        <div class="row">
+          <div class="col">
+            <div class="d-flex flex-row-reverse">
+              <nav class="navbar navbar-expand-xl">
+                <ul class="navbar-nav">
+                  <li>
+                    <a href="/index" class="btn btn-dark">
+                      < Back
+                    </a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h2>College Fest at XYZ COE</h2>
+      <br>
+      {{ if .AddedToCart }}
+
+        <h3>Your Cart Currently</h3>
+        
+        <div id="checkout-div">
+          <div class="container">
+
+            <br><br>
+
+            {{ if .Premium }}
+              <div class="row">
+                <div class="col d-flex flex-row-reverse">Premium Passes : </div>
+                <div class="col d-flex">{{ .Premium }} x {{ .PremiumCost }} = {{ .PremiumTotal }} &#8377;</div>
+              </div>
+              <br>
+            {{ end }}
+
+            {{ if .Base }}
+              <div class="row">
+                <div class="col d-flex flex-row-reverse">Base Passes : </div>
+                <div class="col d-flex">{{ .Base }} x {{ .BaseCost }} = {{ .BaseTotal }} &#8377;</div>
+              </div>
+              <br>
+            {{ end }}
+
+            {{ if .Minimum }}
+              <div class="row">
+                <div class="col d-flex flex-row-reverse">Minimum Passes : </div>
+                <div class="col d-flex">{{ .Minimum }} x {{ .MinimumCost }} = {{ .MinimumTotal }} &#8377;</div>
+              </div>
+              <br>
+            {{ end }}
+
+          </div>
+        </div>
+      {{ else }}
+        <div id="form-div">
+          <form method="post">
+            <div class="form-group">
+              <div class="form-row">
+                <label>Premium Pass&nbsp;</label>
+                <input type="number" min="0" name="premiumTicks" placeholder="premium">
+                <br>
+                <small>Price : 500 &#8377;</small>
+                <br>
+                <small>Entry + All Events + Food & Beverages</small>
+              </div>
+              <br>
+
+              <div class="form-row">
+                <label>&emsp;&emsp;Base Pass&nbsp;</label>
+                <input type="number" min="0" name="baseTicks" placeholder="base">
+                <br>
+                <small>Price : 300 &#8377;</small>
+                <br>
+                <small>Entry + All Events</small>
+              </div>
+              <br>
+
+              <div class="form-row">
+                <label>Minimum Pass&nbsp;</label>
+                <input type="number" min="0" name="minimumTicks" placeholder="minimum">
+                <br>
+                <small>Price : 100 &#8377;</small>
+                <br>
+                <small>Only Entry (Special Events Not Included)</small>
+              </div>
+              <br>
+
+              <div class="form-row">
+                <button class="btn btn-lg" type="submit" style="border-color: lightgreen; color: lightgreen">Add To Cart</button>
+              </div>
+            </div>
+
+          </form>
+        </div>
+      {{ end }}
+
+      <!-- Feedback Begins -->
+      <div id="feedback">
+        <br>
+        {{ if .AddedToCart }}
+          <h5>{{ .MsgString }} &#8377;</h5>
+        {{ end }}
+      </div>
+      <!-- Feedback Ends -->
+
+      {{ if .AddedToCart }}
+        <div id="button-grid" class="d-grid gap-2 d-md-block">
+          <a href="/ticket-booking">
+            <button class="btn btn-outline-primary btn-lg" type="submit">Edit</button>
+          </a>
+          <a href="/receipt">
+            <button class="btn btn-outline-danger  btn-lg" type="submit">Checkout</button>
+          </a>
+        </div>
+      {{ end }}
+
+    </div>
+    <!-- main-div Ends -->
+</body>
+</html>
