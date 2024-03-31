@@ -25,21 +25,21 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		password: r.FormValue("pass"),
 	}
 
-	for it, log := range registersDb {
-		if loglet.username == log.username {
-			currSalt := registersDb[it].salt
-			err = bcrypt.CompareHashAndPassword([]byte(registersDb[it].passHsh),
+	for _, currReg := range registersDb {
+		if loglet.username == currReg.username {
+			currSalt := currReg.salt
+			err = bcrypt.CompareHashAndPassword([]byte(currReg.passHsh),
 				[]byte(loglet.password+currSalt))
 			if err != nil {
-				fmt.Println("Wrong Password")
+				log.Println("Wrong Password")
 				tmpl.ExecuteTemplate(w, "login.html", "Passwords don't match")
 				return
 			} else {
-				user.Username = log.username
-				user.Id = log.id
-				user.TicketId = log.ticketId
+				user.Username = currReg.username
+				user.Id = currReg.id
+				user.TicketId = currReg.ticketId
 				user.UserQR = fmt.Sprintf(`<img src="./../resources/QRCodes/%v.png" width="128px">`,
-					log.ticketId)
+					currReg.ticketId)
 				http.Redirect(w, r, "/index", http.StatusSeeOther)
 			}
 		}
@@ -108,7 +108,7 @@ func updatePassHandler(w http.ResponseWriter, r *http.Request) {
 
 	if r.FormValue("pass0") == r.FormValue("pass1") {
 		//New Password = pass0
-		fmt.Printf("UPDATE users SET passHsh='bcypt(pass0+salt)' WHERE email='%s';",
+		log.Printf("UPDATE users SET passHsh='bcypt(pass0+salt)' WHERE email='%s';",
 			userAuth.Email)
 
 		newPassword := r.FormValue("pass0")
@@ -163,12 +163,13 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		registeretDb := registerDbDetails{
 			username: registret.username,
 			email:    registret.email,
-			salt:     "",
+			salt: fmt.Sprint(((rand.Int31n(9) + 1) * 10000) + (rand.Int31n(10) * 1000) +
+				(rand.Int31n(10) * 100) + (rand.Int31n(10) * 10) + (rand.Int31n(10))),
 		}
 
 		passHshBytes, err := bcrypt.GenerateFromPassword([]byte(registret.password+registeretDb.salt), bcrypt.MinCost)
 		if err != nil {
-			fmt.Println("Error During Encryption")
+			log.Println("Error During Encryption")
 			log.Fatal(err)
 		}
 		registeretDb.passHsh = string(passHshBytes)

@@ -28,6 +28,7 @@ func main() {
 	}
 
 	loadRegistrations(dbPtr)
+	cleanup()
 
 	err = godotenv.Load()
 	if err != nil {

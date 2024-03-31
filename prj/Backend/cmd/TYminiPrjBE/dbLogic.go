@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
 )
 
 var registersDb []registerDbDetails
@@ -60,5 +61,32 @@ func updatePassword(email, passHsh string) {
 		log.Printf("Password Updated Successfully")
 		registersDb = nil
 		loadRegistrations(dbPtr)
+	}
+}
+
+// Cleanup Old Data
+func cleanup() {
+	files, err := os.ReadDir("./../Frontend/resources/QRCodes/")
+	if err != nil {
+		log.Printf("Error While Looking For QRCodes Dir")
+		log.Fatal(err)
+	}
+
+	for _, file := range files {
+		deleteFile := true
+		for _, regs := range registersDb {
+			if file.Name() == fmt.Sprint(regs.ticketId)+".png" {
+				deleteFile = false
+
+			}
+		}
+		if deleteFile {
+			log.Printf("File : %s is getting deleted\n", file.Name())
+			path := fmt.Sprintf("./../Frontend/resources/QRCodes/%s", file.Name())
+			err = os.Remove(path)
+			if err != nil {
+				log.Fatal("Error While Deleting a Redundant png file")
+			}
+		}
 	}
 }
