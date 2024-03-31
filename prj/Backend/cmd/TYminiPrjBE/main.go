@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"text/template"
 
+	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -27,6 +29,15 @@ func main() {
 
 	loadRegistrations(dbPtr)
 
+	err = godotenv.Load()
+	if err != nil {
+		fmt.Println("Error Loading Environment Variables")
+		log.Fatal(err)
+	}
+	email = os.Getenv("email")
+	apass = os.Getenv("apass")
+	port = os.Getenv("port")
+
 	tmpl, err = template.ParseGlob("./../Frontend/html/*.html")
 	if err != nil {
 		log.Fatal(err)
@@ -34,6 +45,10 @@ func main() {
 
 	http.HandleFunc("/", homeHandler)
 	http.HandleFunc("/login", loginHandler)
+	http.HandleFunc("/login/forgotPass", forgotPassHandler)
+	http.HandleFunc("/login/forgotPass/changePass", changePassHandler)
+	http.HandleFunc("/login/forgotPass/updatePass", updatePassHandler)
+
 	http.HandleFunc("/register", registerHandler)
 	http.HandleFunc("/index", indexHandler)
 	http.HandleFunc("/ticket-booking", bookingFormHandler)
@@ -43,5 +58,5 @@ func main() {
 
 	http.Handle("/resources/", http.StripPrefix("/resources", http.FileServer(http.Dir("./../Frontend/resources/"))))
 
-	log.Fatal(http.ListenAndServe(":8420", nil))
+	log.Fatal(http.ListenAndServe(":42069", nil))
 }

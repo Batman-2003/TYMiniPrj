@@ -13,6 +13,14 @@ type userDetails struct {
 	UserQR   string
 }
 
+type recoveryDetails struct {
+	ReqSent   bool
+	Email     string
+	Auth      string
+	AuthCode  uint32
+	MsgString string
+}
+
 type registerDbDetails struct {
 	id       uint32
 	username string
@@ -51,6 +59,10 @@ type bookingTicketFeedback struct {
 
 // -------------------------------Variables----------------------------
 var user = userDetails{}
+var userAuth = recoveryDetails{}
+var email string
+var apass string
+var port string
 
 // -------------------------------Constants-------------------------------
 const t1Cost uint32 = 500

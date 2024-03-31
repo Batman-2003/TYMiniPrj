@@ -3,9 +3,11 @@ package main
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"strconv"
 
+	"github.com/Batman-2003/TYminiPrj/Prj/Backend/internal/myEmail"
 	"github.com/Batman-2003/TYminiPrj/Prj/Backend/internal/myQRLib"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -41,6 +43,66 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 				http.Redirect(w, r, "/index", http.StatusSeeOther)
 			}
 		}
+	}
+}
+
+func forgotPassHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		tmpl.ExecuteTemplate(w, "forgotPass.html", nil)
+		return
+	}
+
+	userAuth.Email = r.FormValue("email")
+	userAuth.AuthCode = uint32(((rand.Int31n(9) + 1) * 10000) +
+		(rand.Int31n(10) * 1000) + (rand.Int31n(10) * 100) + (rand.Int31n(10) * 10) +
+		(rand.Int31n(10)))
+
+	if userAuth.Email != "" && !userAuth.ReqSent {
+		for _, reg := range registersDb {
+			if userAuth.Email == reg.email {
+				body := []byte("From:" + email + "\r\n" +
+					"To:" + userAuth.Email + "\r\n" +
+					"Subject: Forgot Password" + "\r\n" +
+					"\r\n" +
+					"The following is your Auth Code for logging into your Tickzy Acc\r\n" +
+					fmt.Sprint(userAuth.AuthCode) + "\r\n")
+
+				myEmail.SendMail(body, email, apass, port, []string{userAuth.Email})
+				userAuth.ReqSent = true
+				http.Redirect(w, r, "/login/forgotPass/changePass", http.StatusSeeOther)
+			}
+		}
+	}
+}
+
+func changePassHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		tmpl.ExecuteTemplate(w, "changePass.html", userAuth)
+		return
+	}
+
+	userAuth.Auth = r.FormValue("auth")
+	if userAuth.Auth == fmt.Sprint(userAuth.AuthCode) {
+		userAuth.ReqSent = false
+		http.Redirect(w, r, "/login/forgotPass/updatePass", http.StatusSeeOther)
+	} else {
+		userAuth.MsgString = "Didn't Match"
+		tmpl.ExecuteTemplate(w, "changePass.html", userAuth)
+	}
+}
+
+func updatePassHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		tmpl.ExecuteTemplate(w, "changePass.html", userAuth)
+		return
+	}
+
+	if r.FormValue("pass0") == r.FormValue("pass1") {
+		//New Password = pass0
+		fmt.Printf("UPDATE users SET passHsh='bcypt(pass0+salt)' WHERE email='%s';",
+			userAuth.Email)
+		userAuth = recoveryDetails{}
+		http.Redirect(w, r, "/index", http.StatusSeeOther)
 	}
 }
 
@@ -164,10 +226,12 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func logoutHandler(w http.ResponseWriter, r *http.Request) {
-	user.Username = ""
-	user.TicketId = 0
-	user.Id = 0
-	user.UserQR = ""
+	// user.Username = ""
+	// user.TicketId = 0
+	// user.Id = 0
+	// user.UserQR = ""
+	user = userDetails{}
+	userAuth = recoveryDetails{}
 	http.Redirect(w, r, "/index", http.StatusSeeOther)
 }
 

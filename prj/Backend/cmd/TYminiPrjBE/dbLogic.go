@@ -25,7 +25,6 @@ func loadRegistrations(dbPtr *sql.DB) {
 	}
 
 	fmt.Println("-----------Registrations Loaded Successfully-----------")
-	fmt.Println(registersDb)
 }
 
 func registerUser(dbPtr *sql.DB, reg registerDbDetails) {

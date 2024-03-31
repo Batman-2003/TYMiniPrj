@@ -13,6 +13,6 @@ func SendMail(body []byte, senderId, appPass, port string, receiverIds []string)
 		fmt.Println("Error Sending Mail")
 		log.Fatal(err)
 	} else {
-		fmt.Println("Well atleast it didn't Error")
+		fmt.Println("Email Was Sent Successfully. To: " + receiverIds[0])
 	}
 }
