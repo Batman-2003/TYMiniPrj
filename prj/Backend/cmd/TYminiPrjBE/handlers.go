@@ -33,11 +33,11 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 				tmpl.ExecuteTemplate(w, "login.html", "Passwords don't match")
 				return
 			} else {
-				user.Username = registersDb[it].username
-				user.Id = registersDb[it].id
-				user.TicketId = registersDb[it].ticketId
+				user.Username = log.username
+				user.Id = log.id
+				user.TicketId = log.ticketId
 				user.UserQR = fmt.Sprintf(`<img src="./../resources/QRCodes/%v.png" width="128px">`,
-					user.TicketId)
+					log.ticketId)
 				http.Redirect(w, r, "/index", http.StatusSeeOther)
 			}
 		}
