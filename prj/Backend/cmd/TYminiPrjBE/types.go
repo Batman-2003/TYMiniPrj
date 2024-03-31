@@ -15,6 +15,7 @@ type userDetails struct {
 
 type recoveryDetails struct {
 	ReqSent   bool
+	Success   bool
 	Email     string
 	Auth      string
 	AuthCode  uint32

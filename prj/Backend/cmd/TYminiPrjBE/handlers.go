@@ -64,7 +64,7 @@ func forgotPassHandler(w http.ResponseWriter, r *http.Request) {
 					"To:" + userAuth.Email + "\r\n" +
 					"Subject: Forgot Password" + "\r\n" +
 					"\r\n" +
-					"The following is your Auth Code for logging into your Tickzy Acc\r\n" +
+					"The following is your Auth Code for changing password of your Tickzy Acc\r\n" +
 					fmt.Sprint(userAuth.AuthCode) + "\r\n")
 
 				myEmail.SendMail(body, email, apass, port, []string{userAuth.Email})
@@ -72,6 +72,13 @@ func forgotPassHandler(w http.ResponseWriter, r *http.Request) {
 				http.Redirect(w, r, "/login/forgotPass/changePass", http.StatusSeeOther)
 			}
 		}
+
+		if !userAuth.ReqSent {
+			// Email is not Available in Database
+			userAuth.MsgString = "Email Not Available in Database"
+			tmpl.ExecuteTemplate(w, "forgotPass.html", userAuth)
+		}
+
 	}
 }
 
@@ -83,15 +90,17 @@ func changePassHandler(w http.ResponseWriter, r *http.Request) {
 
 	userAuth.Auth = r.FormValue("auth")
 	if userAuth.Auth == fmt.Sprint(userAuth.AuthCode) {
+		userAuth.Success = true
 		userAuth.ReqSent = false
 		http.Redirect(w, r, "/login/forgotPass/updatePass", http.StatusSeeOther)
 	} else {
-		userAuth.MsgString = "Didn't Match"
+		userAuth.MsgString = "Didn't Match, Try Again"
 		tmpl.ExecuteTemplate(w, "changePass.html", userAuth)
 	}
 }
 
 func updatePassHandler(w http.ResponseWriter, r *http.Request) {
+	userAuth.MsgString = ""
 	if r.Method != http.MethodPost {
 		tmpl.ExecuteTemplate(w, "changePass.html", userAuth)
 		return
@@ -101,8 +110,20 @@ func updatePassHandler(w http.ResponseWriter, r *http.Request) {
 		//New Password = pass0
 		fmt.Printf("UPDATE users SET passHsh='bcypt(pass0+salt)' WHERE email='%s';",
 			userAuth.Email)
+
+		newPassword := r.FormValue("pass0")
+		newSalt := ""
+		newPassHsh, err := bcrypt.GenerateFromPassword([]byte(newPassword+newSalt), bcrypt.MinCost)
+		if err != nil {
+			log.Println("Error in Hashing New Password")
+			log.Fatal(err)
+		}
+		updatePassword(userAuth.Email, string(newPassHsh))
+
 		userAuth = recoveryDetails{}
 		http.Redirect(w, r, "/index", http.StatusSeeOther)
+	} else {
+		userAuth.MsgString = "Passwords Don't Match. Try Again"
 	}
 }
 

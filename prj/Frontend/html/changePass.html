@@ -25,6 +25,7 @@
   }
 </style>
 <!-- CSS Ends -->
+
 <body>
 
   <!-- main-div Begins -->
@@ -40,7 +41,7 @@
           <button type="submit">Submit</button>
         </div>
       </form>
-    {{ else }}
+    {{ else if .Success }}
       <h3>Update Password</h3>
       <br>
       <form method="post">
@@ -58,11 +59,12 @@
           <button type="submit">Submit</button>
         </div>
       </form>
+      {{ else }}
+        <h1>All steps weren't followed.Try Again</h1>
+      {{ end }}
   
   
-    {{ end }}
 
-    {{ .MsgString }}
   </div>
   <!-- main-div Ends -->
 

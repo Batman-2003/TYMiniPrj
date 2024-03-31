@@ -12,7 +12,7 @@ func loadRegistrations(dbPtr *sql.DB) {
 	rows, err := dbPtr.Query(`SELECT id, username, email, passHsh, salt, ticketId 
 		FROM users;`)
 	if err != nil {
-		fmt.Println("Error Selecting from Database")
+		log.Println("Error Selecting from Database")
 		log.Fatal(err)
 	}
 	defer rows.Close()
@@ -34,7 +34,7 @@ func registerUser(dbPtr *sql.DB, reg registerDbDetails) {
 
 	_, err = dbPtr.Exec(query)
 	if err != nil {
-		fmt.Println("Error Registering New User")
+		log.Println("Error Registering New User")
 		log.Fatal(err)
 	}
 }
@@ -45,6 +45,20 @@ func loadTicketId(dbPtr *sql.DB, id uint32, ticketId uint64) {
 	fmt.Println(query)
 	_, err = dbPtr.Exec(query)
 	if err != nil {
-		fmt.Println("Error Updating Ticket Value")
+		log.Println("Error Updating Ticket Value")
+	}
+}
+
+func updatePassword(email, passHsh string) {
+	query := fmt.Sprintf(`UPDATE users SET passHsh='%s' WHERE email='%s';`,
+		passHsh, email)
+	_, err = dbPtr.Exec(query)
+	if err != nil {
+		log.Printf("Error While Updating password in DB.")
+		log.Fatal(err)
+	} else {
+		log.Printf("Password Updated Successfully")
+		registersDb = nil
+		loadRegistrations(dbPtr)
 	}
 }
