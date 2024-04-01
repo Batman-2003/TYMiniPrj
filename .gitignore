@@ -1,5 +1,1 @@
-# *.env
-# /prj/Backend/.env
 /prj/Backend/*.env
-# ./prj/Backend/.env
-# ./prj/Backend/*.env
