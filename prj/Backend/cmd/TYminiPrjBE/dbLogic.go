@@ -64,9 +64,23 @@ func updatePassword(email, passHsh string) {
 	}
 }
 
+func updateSalt(email, salt string) {
+	query := fmt.Sprintf(`UPDATE users SET salt='%s' WHERE email='%s';`,
+		salt, email)
+	_, err := dbPtr.Exec(query)
+	if err != nil {
+		log.Print("Error While Updating Salt in DB.")
+		log.Fatal(err)
+	} else {
+		log.Printf("Salt Updated Successfully")
+		registersDb = nil
+		loadRegistrations(dbPtr)
+	}
+}
+
 // Cleanup Old Data
 func cleanup() {
-	files, err := os.ReadDir("./../Frontend/resources/QRCodes/")
+	files, err := os.ReadDir("./../Frontend/Resources/QRCodes/")
 	if err != nil {
 		log.Printf("Error While Looking For QRCodes Dir")
 		log.Fatal(err)
@@ -82,7 +96,7 @@ func cleanup() {
 		}
 		if deleteFile {
 			log.Printf("File : %s is getting deleted\n", file.Name())
-			path := fmt.Sprintf("./../Frontend/resources/QRCodes/%s", file.Name())
+			path := fmt.Sprintf("./../Frontend/Resources/QRCodes/%s", file.Name())
 			err = os.Remove(path)
 			if err != nil {
 				log.Fatal("Error While Deleting a Redundant png file")

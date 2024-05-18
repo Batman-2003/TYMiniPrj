@@ -57,7 +57,7 @@ func main() {
 	http.HandleFunc("/contactUs", contactUsHandler)
 	http.HandleFunc("/logout", logoutHandler)
 
-	http.Handle("/resources/", http.StripPrefix("/resources", http.FileServer(http.Dir("./../Frontend/resources/"))))
+	http.Handle("/Resources/", http.StripPrefix("/Resources", http.FileServer(http.Dir("./../Frontend/Resources/"))))
 
 	log.Fatal(http.ListenAndServe(":42069", nil))
 }

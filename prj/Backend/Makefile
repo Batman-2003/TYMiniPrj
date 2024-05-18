@@ -1,5 +1,6 @@
-default:
-	go build ./cmd/TYminiPrjBE
 
-run:default
-	./TYminiPrjBE.exe
+build: 
+	go build -o ./bin/ ./cmd/TYminiPrjBE 
+
+run: build
+	./bin/TYminiPrjBE

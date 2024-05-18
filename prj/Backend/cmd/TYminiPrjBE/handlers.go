@@ -38,12 +38,16 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 				user.Username = currReg.username
 				user.Id = currReg.id
 				user.TicketId = currReg.ticketId
-				user.UserQR = fmt.Sprintf(`<img src="./../resources/QRCodes/%v.png" width="128px">`,
+				user.UserQR = fmt.Sprintf(`<img src="./../Resources/QRCodes/%v.png" width="128px">`,
 					currReg.ticketId)
 				http.Redirect(w, r, "/index", http.StatusSeeOther)
+				return
 			}
 		}
 	}
+	log.Println("Wrong Username")
+	tmpl.ExecuteTemplate(w, "login.html", "Username is not Registered")
+	return
 }
 
 func forgotPassHandler(w http.ResponseWriter, r *http.Request) {
@@ -70,6 +74,7 @@ func forgotPassHandler(w http.ResponseWriter, r *http.Request) {
 				myEmail.SendMail(body, email, apass, port, []string{userAuth.Email})
 				userAuth.ReqSent = true
 				http.Redirect(w, r, "/login/forgotPass/changePass", http.StatusSeeOther)
+				return
 			}
 		}
 
@@ -112,13 +117,16 @@ func updatePassHandler(w http.ResponseWriter, r *http.Request) {
 			userAuth.Email)
 
 		newPassword := r.FormValue("pass0")
-		newSalt := ""
+		newSalt := fmt.Sprint(((rand.Int31n(9) + 1) * 10000) + (rand.Int31n(10) * 1000) +
+			(rand.Int31n(10) * 100) + (rand.Int31n(10) * 10) + (rand.Int31n(10)))
+
 		newPassHsh, err := bcrypt.GenerateFromPassword([]byte(newPassword+newSalt), bcrypt.MinCost)
 		if err != nil {
 			log.Println("Error in Hashing New Password")
 			log.Fatal(err)
 		}
 		updatePassword(userAuth.Email, string(newPassHsh))
+		updateSalt(userAuth.Email, newSalt)
 
 		userAuth = recoveryDetails{}
 		http.Redirect(w, r, "/index", http.StatusSeeOther)
@@ -219,7 +227,7 @@ func bookingFormHandler(w http.ResponseWriter, r *http.Request) {
 		user.TicketId = uint64((100 * 100 * 100 * (user.Id + 10)) +
 			(currFeedback.Premium * 100 * 100) + (currFeedback.Base * 100) +
 			(currFeedback.Minimum))
-		user.UserQR = fmt.Sprintf(`<img src="./../resources/QRCodes/%v.png" width="128px">`,
+		user.UserQR = fmt.Sprintf(`<img src="./../Resources/QRCodes/%v.png" width="128px">`,
 			user.TicketId)
 		loadTicketId(dbPtr, user.Id, user.TicketId)
 
